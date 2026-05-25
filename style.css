@@ -148,3 +148,72 @@ body {
     letter-spacing: 0.5px;
     margin-top: 4px;
 }
+
+/* ==========================================
+   SECCIÓN DE ACEPTACIÓN DE TÉRMINOS
+   ========================================== */
+#acceptanceSection {
+    background: linear-gradient(135deg, rgba(13, 110, 253, 0.05) 0%, rgba(13, 110, 253, 0.02) 100%);
+    border: 2px solid #e3f2fd;
+}
+
+#acceptanceSection .alert-warning {
+    border-left-width: 4px !important;
+    border-left-color: #ffc107 !important;
+}
+
+#acceptanceSection .bg-light {
+    background-color: #f8f9fa !important;
+    border: 1px solid #e9ecef;
+}
+
+#acceptanceSection .bg-light ul {
+    padding-left: 1.5rem;
+}
+
+#acceptanceSection .bg-light li {
+    margin-bottom: 0.75rem;
+    color: #495057;
+    line-height: 1.6;
+}
+
+#acceptanceSection .form-check-label {
+    cursor: pointer;
+    font-size: 0.95rem;
+    line-height: 1.6;
+    padding-top: 0.25rem;
+}
+
+#acceptanceSection .btn-lg {
+    padding: 0.75rem 1.5rem;
+    font-size: 1rem;
+    border-radius: 0.5rem;
+    font-weight: 500;
+    transition: all 0.3s ease;
+}
+
+#acceptanceSection .btn-primary:disabled {
+    cursor: not-allowed;
+    opacity: 0.5;
+}
+
+#acceptanceSection .btn-primary:not(:disabled):hover {
+    transform: translateY(-2px);
+    box-shadow: 0 6px 20px rgba(13, 110, 253, 0.3);
+}
+
+/* Animación suave cuando se muestra la sección del test */
+#testSection {
+    animation: fadeIn 0.5s ease-in;
+}
+
+@keyframes fadeIn {
+    from {
+        opacity: 0;
+        transform: translateY(10px);
+    }
+    to {
+        opacity: 1;
+        transform: translateY(0);
+    }
+}
