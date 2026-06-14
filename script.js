@@ -1,7 +1,37 @@
 // Elementos del DOM
+const acceptTermsCheckbox = document.getElementById('acceptTerms');
+const beginTestBtn = document.getElementById('beginTestBtn');
+const acceptanceSection = document.getElementById('acceptanceSection');
 const form = document.getElementById('driveSyncTestForm');
 const resultsSection = document.getElementById('resultsSection');
 const restartBtn = document.getElementById('restartBtn');
+
+// ==========================================
+// 1. LÓGICA DE LA PANTALLA DE INICIO
+// ==========================================
+
+// Escuchar cambios en el checkbox de aceptación
+acceptTermsCheckbox.addEventListener('change', function() {
+    // Habilitar o deshabilitar el botón según el estado del checkbox
+    beginTestBtn.disabled = !this.checked;
+});
+
+// Escuchar click en el botón de comenzar
+beginTestBtn.addEventListener('click', function() {
+    // Ocultar la sección de aceptación
+    acceptanceSection.style.display = 'none';
+    
+    // Mostrar la sección del test
+    form.style.display = 'block';
+    
+    // Scroll hacia el inicio del test
+    form.scrollIntoView({ behavior: 'smooth', block: 'start' });
+});
+
+
+// ==========================================
+// 2. LÓGICA DE PROCESAMIENTO Y RESULTADOS
+// ==========================================
 
 // Perfiles según la documentación Nexus 2026
 const PROFILES = {
@@ -26,19 +56,12 @@ if (form) {
         const formData = new FormData(form);
         const answers = Object.fromEntries(formData.entries());
 
-        // Validación básica (asegurar que se respondieron todas las de escala al menos para el cálculo)
-        if (Object.keys(answers).length < 46) {
-            alert("Por favor, completa todas las preguntas para un análisis preciso.");
-            // En un entorno de producción, puedes forzar esto, para pruebas lo dejamos pasar.
-        }
-
         procesarResultados(answers);
     });
 }
 
 function procesarResultados(answers) {
     // 1. CÁLCULO DE COHERENCIA (Fórmula de diferencias absolutas)
-    // Pares identificados en el HTML basados en el PDF pautas
     const mirrorPairs = [
         { main: 'p24', mirror: 'p36' }, // Motivación Intrínseca
         { main: 'p37', mirror: 'p38' }, // Autonomía
@@ -63,7 +86,7 @@ function procesarResultados(answers) {
         }
     });
 
-    // Score de consistencia base 100. Max diferencia por par es 4. Total max = pairsCalculated * 4
+    // Score de consistencia base 100
     const maxPossibleDiff = pairsCalculated * 4;
     let consistencyScore = 100;
     if (maxPossibleDiff > 0) {
@@ -78,8 +101,7 @@ function procesarResultados(answers) {
     else if (consistencyScore >= 40) consistencyText = "Inconsistencia relevante";
     else consistencyText = "Posible fake/random";
 
-    // 3. ÍNDICE DE MOTIVACIÓN Y PERFIL (Simulación algorítmica basada en dimensiones)
-    // Evaluamos un par de preguntas clave para determinar el perfil más fuerte
+    // 3. ÍNDICE DE MOTIVACIÓN Y PERFIL
     let profileScores = {
         "Intrinsic Builder": parseInt(answers.p24 || 3) + (answers.p1 === 'A' ? 2 : 0),
         "Continuous Learner": parseInt(answers.p39 || 3) + (answers.p4 === 'B' ? 2 : 0),
@@ -94,29 +116,32 @@ function procesarResultados(answers) {
     // Encontrar el perfil dominante
     let topProfile = Object.keys(profileScores).reduce((a, b) => profileScores[a] > profileScores[b] ? a : b);
     
-    // Simular un WMI (Work Motivation Index) lógico combinando escala general
+    // WMI (Work Motivation Index)
     let wmiBase = 50 + (profileScores[topProfile] * 5); 
     const finalWMI = Math.min(100, Math.max(0, wmiBase));
 
-    // 4. ACTUALIZAR UI
+    // 4. ACTUALIZAR INTERFAZ
     document.getElementById('resConsistency').innerText = `${consistencyScore}/100`;
     document.getElementById('resConsistencyText').innerText = consistencyText;
     document.getElementById('resWMI').innerText = `${finalWMI}/100`;
     document.getElementById('resProfile').innerText = topProfile;
     document.getElementById('resProfileDesc').innerText = PROFILES[topProfile];
 
-    // Animación de transición
+    // Animación de transición hacia los resultados
     form.style.display = 'none';
     resultsSection.style.display = 'block';
     resultsSection.scrollIntoView({ behavior: 'smooth', block: 'start' });
 }
 
-// Lógica de reinicio
+// Lógica de reinicio para hacer el test de nuevo
 if(restartBtn) {
     restartBtn.addEventListener('click', () => {
         form.reset();
+        acceptTermsCheckbox.checked = false;
+        beginTestBtn.disabled = true;
+        
         resultsSection.style.display = 'none';
-        form.style.display = 'block';
+        acceptanceSection.style.display = 'block';
         window.scrollTo({ top: 0, behavior: 'smooth' });
     });
 }
